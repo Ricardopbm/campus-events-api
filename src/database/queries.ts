@@ -1,7 +1,8 @@
 import { HttpError } from '../errors';
 import { getPool } from './pool';
 import { Person } from './types';
-import type { CampusEvent, EventInput } from '../routes/events';
+import type { CampusEvent, EventInput } from '../domain/events';
+import { evaluateRegistration } from '../domain/registrations';
 import type { Registration, RegistrationInput } from '../routes/registrations';
 
 export interface Queries {
@@ -28,19 +29,31 @@ export const makeQueries = (databaseUrl: string): Queries => {
         );
         const event = events[0];
         if (!event) throw new HttpError(404, 'Event not found');
-        if (event.startsAt.getTime() <= Date.now())
-          throw new HttpError(409, 'Event has already started');
         const duplicate = await client.query(
           'SELECT id FROM registrations WHERE event_id = $1 AND email = $2',
           [eventId, email],
         );
-        if (duplicate.rowCount)
-          throw new HttpError(409, 'Email is already registered for this event');
         const count = await client.query<{ total: number }>(
           'SELECT count(*)::int AS total FROM registrations WHERE event_id = $1',
           [eventId],
         );
-        if (count.rows[0].total >= event.capacity) throw new HttpError(409, 'Event is full');
+        const decision = evaluateRegistration(
+          {
+            startsAt: event.startsAt.getTime(),
+            capacity: event.capacity,
+            registeredCount: count.rows[0].total,
+            alreadyRegistered: Boolean(duplicate.rowCount),
+          },
+          Date.now(),
+        );
+        if (!decision.allowed) {
+          const messages = {
+            started: 'Event has already started',
+            duplicate: 'Email is already registered for this event',
+            full: 'Event is full',
+          };
+          throw new HttpError(409, messages[decision.reason]);
+        }
         const { rows } = await client.query<Registration>(
           `INSERT INTO registrations (event_id, name, email) VALUES ($1, $2, $3)
            RETURNING id, event_id AS "eventId", name, email, created_at AS "createdAt"`,
