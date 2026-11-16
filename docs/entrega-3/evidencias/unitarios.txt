@@ -1,0 +1,14 @@
+
+> template-node-express@0.0.1 test
+> vitest --run src/domain
+
+
+ RUN  v3.1.4 C:/Users/RIC/Desktop/Aulas de quarta/TÓPICOS EM DESENVOLVIMENTO DE SISTEMAS/trabalhos/campus-events-api
+
+ ✓ src/domain/registrations.test.ts (13 tests) 4ms
+ ✓ src/domain/events.test.ts (15 tests) 10ms
+
+ Test Files  2 passed (2)
+      Tests  28 passed (28)
+   Start at  22:05:18
+   Duration  486ms (transform 59ms, setup 0ms, collect 149ms, tests 13ms, environment 0ms, prepare 128ms)
