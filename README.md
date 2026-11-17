@@ -6,6 +6,7 @@ Repositório de Ricardo Minuto, a partir do projeto fornecido em [BeahIF/campus-
 - [Entrega 1 — backlog inicial e seis issues](docs/entrega-1/README.md)
 - [Entrega 2 — funcionalidades, PRs e evidências](docs/entrega-2/README.md)
 - [Entrega 3 — regras de domínio e testes unitários](docs/entrega-3/README.md)
+- [Entrega 4 — integração contínua e cobertura](docs/entrega-4/README.md)
 
 A documentação do template original está preservada abaixo, com a URL de clone adaptada para este fork.
 
