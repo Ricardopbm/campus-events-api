@@ -1,3 +1,0 @@
-{"time":"2026-11-25T14:40:41.285Z","url":"https://campus-events-api-ricardopbm.onrender.com/health","status":200,"body":{"status":"healthy","timestamp":"2026-11-25T14:40:41.481Z"}}
-{"time":"2026-11-25T14:40:41.578Z","url":"https://campus-events-api-ricardopbm.onrender.com/health/deep","status":200,"body":{"status":"healthy","timestamp":"2026-11-25T14:40:41.736Z"}}
-{"time":"2026-11-25T14:40:41.771Z","url":"https://campus-events-api-ricardopbm.onrender.com/events","status":200,"body":[]}

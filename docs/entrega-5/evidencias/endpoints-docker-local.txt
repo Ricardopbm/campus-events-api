@@ -1,3 +1,0 @@
-{"time":"2026-11-25T14:26:47.467Z","url":"http://localhost:3011/health","status":200,"body":{"status":"healthy","timestamp":"2026-11-25T14:26:47.417Z"}}
-{"time":"2026-11-25T14:26:47.493Z","url":"http://localhost:3011/health/deep","status":200,"body":{"status":"healthy","timestamp":"2026-11-25T14:26:47.493Z"}}
-{"time":"2026-11-25T14:26:47.503Z","url":"http://localhost:3011/events","status":200,"body":[{"id":1,"title":"Oficina de desenvolvimento","description":null,"startsAt":"2026-11-22T23:21:23.167Z","capacity":1},{"id":2,"title":"Oficina de inscricoes","description":null,"startsAt":"2026-11-22T23:23:27.791Z","capacity":1}]}

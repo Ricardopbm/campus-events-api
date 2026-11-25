@@ -1,5 +1,0 @@
-
-> template-node-express@0.0.1 lint
-> eslint . --max-warnings 0
-
-Exit code: 0
