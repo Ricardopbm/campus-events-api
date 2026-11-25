@@ -1,173 +1,146 @@
-# Campus Events API — atividades
+# Campus Events API
 
-Repositório de Ricardo Minuto, a partir do projeto fornecido em [BeahIF/campus-events-api](https://github.com/BeahIF/campus-events-api).
+API para cadastro e listagem de eventos de um campus e inscrições com controle de vagas, data de início e duplicidade de e-mail. Base: [BeahIF/campus-events-api](https://github.com/BeahIF/campus-events-api).
 
-- [Entrega 0 — configuração do ambiente, resultados e evidências](docs/entrega-0/README.md)
-- [Entrega 1 — backlog inicial e seis issues](docs/entrega-1/README.md)
-- [Entrega 2 — funcionalidades, PRs e evidências](docs/entrega-2/README.md)
-- [Entrega 3 — regras de domínio e testes unitários](docs/entrega-3/README.md)
-- [Entrega 4 — integração contínua e cobertura](docs/entrega-4/README.md)
+## Versão e acesso
 
-A documentação do template original está preservada abaixo, com a URL de clone adaptada para este fork.
+A versão com eventos, inscrições, regras de domínio, testes, CI e deploy está na branch **deploy/ambiente-publicacao**. Os PRs ainda estão em integração; a main não contém todas essas funcionalidades. A refatoração do PR #12 foi integrada à branch feat/inscricoes-eventos e ainda precisa ser conciliada com as etapas posteriores.
 
----
-# Node.js API Template
+API: https://campus-events-api-ricardopbm.onrender.com
 
-> A Node.js API template with Express, TypeScript and PostgreSQL
+Saúde da API e do banco: https://campus-events-api-ricardopbm.onrender.com/health/deep
 
-[![CI](https://github.com/miikkaylisiurunen/template-node-express/actions/workflows/ci.yml/badge.svg)](https://github.com/miikkaylisiurunen/template-node-express/actions/workflows/ci.yml)
+O banco gratuito expira em **25/12/2026**. A primeira requisição após inatividade pode demorar 50 segundos ou mais.
 
-## Table of contents
+## Configuração e execução local
 
-- [Features](#features)
-- [How to use](#how-to-use)
-  - [Requirements](#requirements)
-  - [Getting started](#getting-started)
-  - [Scripts](#scripts)
-  - [Default routes](#default-routes)
-- [Directory structure](#directory-structure)
-- [Consistent error handling](#consistent-error-handling)
-  - [Throwing consistent errors](#throwing-consistent-errors)
-  - [Error handler middleware](#error-handler-middleware)
-- [Testing](#testing)
-  - [Running tests](#running-tests)
-  - [Automated tests](#automated-tests)
-- [Continuous integration](#continuous-integration)
+Requisitos: Git, Node.js 22 com npm e Docker Desktop iniciado. A pipeline também verifica Node 20. Exemplos para PowerShell:
 
-## Features
-
-- Continuous integration with GitHub Actions
-- Type safety enforced with TypeScript to minimize errors and improve maintainability
-- Custom error handling for better user experience and efficient bug tracking
-- Tests powered by [Vitest](https://vitest.dev/) and [Supertest](https://github.com/ladjs/supertest)
-- Runtime validation with [Zod](https://zod.dev/) to ensure data quality and consistency
-- Database migrations using [node-pg-migrate](https://github.com/salsita/node-pg-migrate) for efficient database management
-- Basic request and error logging using [Pino](https://getpino.io/)
-- Dockerfile for easy deployment and containerization
-- Dependency injection for better testability and decoupling of code components
-- Docker Compose for convenient development database setup
-- Dependabot integration for automatic npm package updates and improved security
-- Code formatting and linting with [Prettier](https://prettier.io) and [ESLint](https://eslint.org/) to improve code quality and consistency
-- Environment variable validation
-
-## How to use
-
-### Requirements
-
-- Node.js v20 or higher
-- Docker
-
-### Getting started
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/Ricardopbm/campus-events-api.git
-   ```
-2. Change to the project directory:
-   ```
-   cd campus-events-api
-   ```
-3. Copy `.env.example` to `.env`:
-   ```
-   cp .env.example .env
-   ```
-4. Install npm packages:
-   ```
-   npm install
-   ```
-5. Start the database services with Docker Compose:
-   ```
-   npm run db:up
-   ```
-6. Start the development server:
-   ```
-   npm run dev
-   ```
-
-**Note:** If you update the database credentials in either the `.env` or `docker-compose.yml` file, be sure to also update the other file with the same changes to ensure that the database can still be accessed correctly.
-
-### Scripts
-
-```
-start       # start the production server
-dev         # start the development server
-build       # build the project using tsc
-lint        # find ESLint issues
-lint:fix    # fix ESLint issues
-test        # run tests
-db:up       # start the database services with docker compose
-db:down     # stop and remove the database services
+```powershell
+git clone --branch deploy/ambiente-publicacao https://github.com/Ricardopbm/campus-events-api.git
+cd campus-events-api
+Copy-Item .env.example .env
+npm.cmd ci
+npm.cmd run db:up
+docker compose exec -T postgres-dev pg_isready -U api -d api_dev
+docker compose exec -T postgres-test pg_isready -U api -d api_test
 ```
 
-### Default routes
+Aguardar ambos os bancos aceitarem conexões. Se já existir .env, preservar a configuração local em vez de sobrescrever.
 
-```
-GET /people         # get all people from the database
-POST /people        # add a new person with required body properties: "name" and "age"
-
-GET /health         # basic health check (api status)
-GET /health/deep    # complete health check (api status + database connection)
+```powershell
+npm.cmd run dev
+# Em outro terminal
+Invoke-RestMethod http://localhost:3001/health/deep
 ```
 
-## Directory structure
+A aplicação aplica as migrations pendentes antes de iniciar. Para executar compilada, usar `npm.cmd run build` e `npm.cmd start`. Encerrar com Ctrl+C e parar os bancos com `docker compose stop`.
 
-```
-.
-├── .github          # CI workflows and dependabot config to keep npm packages up to date
-├── migrations       # database migration scripts
-└── src
-    ├── controllers  # route controllers
-    ├── database     # database queries, tests and file to run migrations
-    ├── errors       # custom errors for easier error handling
-    ├── middleware   # middleware functions
-    └── routes       # routes and their tests
-```
+| Variável | Exemplo local | Uso |
+| --- | --- | --- |
+| PORT | 3001 | Porta HTTP |
+| DATABASE_URL | postgres://api:password@localhost:4329/api_dev | Banco de desenvolvimento |
+| TEST_PORT | 3002 | Configuração de testes |
+| TEST_DATABASE_URL | postgres://api:password@localhost:4328/api_test | Banco descartável de testes |
+| NODE_ENV | production no deploy | Ambiente de execução |
 
-## Consistent error handling
+As credenciais de exemplo são somente de desenvolvimento. .env é ignorado pelo Git. Não publicar credenciais de produção.
 
-### Throwing consistent errors
+## Banco e Docker
 
-To ensure consistent error responses and HTTP status codes, use the `HttpError` class when throwing an error. This custom error class is included in the template and provides a straightforward way to throw errors.
+O Compose inicia somente os bancos PostgreSQL 17: api_dev na porta 4329 e api_test na 4328. Não inclui a API nem define volumes nomeados; recriar containers pode perder dados locais. Essa configuração não é uma estratégia de armazenamento durável para produção.
 
-### Error handler middleware
+As migrations criam people, events e registrations. Inscrições possuem chave estrangeira para eventos e unicidade de e-mail por evento. A suíte de integração aplica e desfaz migrations: **nunca apontar TEST_DATABASE_URL para produção ou dados que precisam ser preservados**.
 
-An error handling middleware is included to handle and send consistent responses when errors occur. By default, the error response format is as follows:
+O Dockerfile compila TypeScript em uma etapa e executa o resultado em outra, com dependências de produção e usuário node. .dockerignore exclui ambiente local, Git, dependências e relatórios gerados. Exemplo para Docker Desktop, com o banco local iniciado:
 
-```json
-{
-  "status": 401,
-  "message": "Unauthorized",
-  "name": "HttpError"
-}
+```powershell
+docker build -t campus-events-api:local .
+docker run --rm -p 127.0.0.1:3011:3001 `
+  -e PORT=3001 `
+  -e DATABASE_URL=postgres://api:password@host.docker.internal:4329/api_dev `
+  campus-events-api:local
 ```
 
-You can specify your own `status` and `message` when using the custom `HttpError` class to throw errors. A catch-all error handler is also included which returns a `500` status code whenever an unhandled error is thrown.
+## Endpoints
 
-## Testing
+| Método e caminho | Finalidade | Sucesso |
+| --- | --- | --- |
+| GET /health | Saúde da API | 200 |
+| GET /health/deep | Saúde da API e do banco | 200 |
+| GET /events | Lista ordenada por início e id | 200 com array |
+| POST /events | Criar evento | 201 com evento |
+| POST /events/:eventId/registrations | Inscrever participante | 201 com inscrição |
+| GET /people | Listar pessoas do template | 200 com array |
+| POST /people | Criar pessoa do template | 200 com nome e idade |
 
-This template comes with tests powered by [Vitest](https://vitest.dev) and [Supertest](https://github.com/ladjs/supertest) to ensure the quality and stability of your application through unit and integration testing.
+Evento exige título de 1 a 255 caracteres após trim, descrição opcional de até 10.000, data ISO 8601 com fuso estritamente futura e capacidade inteira de 1 a 2.147.483.647. Inscrição exige nome de 1 a 255 caracteres e e-mail válido de até 254, normalizado com trim e minúsculas.
 
-### Running tests
+Exemplo local com dados fictícios e data calculada para amanhã:
 
-You can manually run tests with the following command:
-
+```powershell
+$base = 'http://localhost:3001'
+$body = @{
+  title = 'Oficina de desenvolvimento'
+  description = 'Evento de demonstracao'
+  startsAt = (Get-Date).ToUniversalTime().AddDays(1).ToString('o')
+  capacity = 1
+} | ConvertTo-Json
+$evento = Invoke-RestMethod -Method Post -Uri "$base/events" `
+  -ContentType 'application/json' -Body $body
+$evento
+Invoke-RestMethod "$base/events"
+$inscrito = @{name='Participante exemplo';email='aluno@example.com'} | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri "$base/events/$($evento.id)/registrations" `
+  -ContentType 'application/json' -Body $inscrito
 ```
-npm test
+
+Evento retorna id, title, description, startsAt e capacity. Inscrição retorna id, eventId, name, email e createdAt. Datas são ISO 8601; IDs e timestamps são gerados pelo banco. Repetir a inscrição produz conflito por duplicidade; outro e-mail encontra lotação no evento de capacidade 1.
+
+Entradas inválidas retornam **400**; evento inexistente, **404**; evento iniciado, duplicidade ou lotação, **409**. Exemplo de erro: `{"status":400,"message":"Invalid request","name":"ZodError"}`. POST /people recebe name não vazio e age maior que zero e até 150; não cria inscrição automaticamente.
+
+## Arquitetura e decisões
+
+Cliente HTTP → Express e middleware → rotas e validação → regras de domínio → consultas SQL → PostgreSQL.
+
+- src/index.ts: configuração, migrations e inicialização.
+- src/app.ts: composição e injeção de consultas e middleware.
+- src/routes e src/controllers: contratos HTTP.
+- src/domain: regras puras de eventos e inscrições.
+- src/database: pool, consultas, tipos e migrations.
+- src/middleware: logs Pino, identificador da requisição e erros.
+- migrations: esquema SQL versionado.
+
+TypeScript oferece tipagem; Express trata HTTP; Zod valida entradas; pg acessa PostgreSQL; node-pg-migrate controla o esquema. validateEvent(input, now) recebe o instante de referência para testes determinísticos. evaluateRegistration(state, now) decide elegibilidade sem HTTP ou banco. A persistência inicia transação e usa SELECT ... FOR UPDATE no evento antes de verificar vagas e duplicidade. Esse bloqueio protege requisições concorrentes; a função pura não substitui o controle transacional. Consultas usam parâmetros e conexões são liberadas em finally.
+
+## Testes e integração contínua
+
+```powershell
+npm.cmd test -- --run src/domain
+npm.cmd test -- --run
+npm.cmd run test:coverage
+npm.cmd run lint
+npm.cmd run build
 ```
 
-This command will run all tests in the `src` directory and output the results to the console.
+Somente os testes de domínio dispensam PostgreSQL. A suíte da versão com regras isoladas tem 68 testes: 28 unitários e 40 de rotas, consultas e integração. Inclui sucesso, erro, limites temporais, última vaga, duplicidade e concorrência. Abrir coverage/index.html para consultar o relatório local.
 
-### Automated tests
+CI e Lint executam em qualquer push e em PRs, além dos gatilhos manuais e reutilizáveis. CI instala com npm ci, compila e testa em Node 20/22 com PostgreSQL 17; lint usa Node 22. Cada job tem timeout de 15 minutos e permissão contents: read. actions/upload-artifact@v7 publica cobertura por versão de Node com retenção de 30 dias. Não há limiar mínimo de cobertura configurado.
 
-A GitHub Actions workflow is included to automatically run tests. Refer to the [Continuous integration](#continuous-integration) section for more information.
+## Publicação e validação
 
-## Continuous integration
+render.yaml define Web Service Docker e PostgreSQL no plano Free, na região Virginia. DATABASE_URL vem da conexão interna; PORT é fornecida pelo Render e NODE_ENV vale production. Acesso externo ao banco está bloqueado. O health check é /health/deep. O deploy inicial usa o commit 78aa348.
 
-This template comes with pre-configured GitHub Actions workflows to automate continuous integration (CI) and ensure that your code is always tested before being merged into the main branch. The workflows run automatically on every push to the `main` branch, or when a pull request is opened, reopened, or synchronized.
+O deploy da aplicação é manual (autoDeployTrigger: off). Mudanças no Blueprint podem sincronizar a infraestrutura e precisam ser revisadas antes do push.
 
-The workflows included are:
+```powershell
+node scripts/check-deploy.mjs https://campus-events-api-ricardopbm.onrender.com
+```
 
-- `ci.yml` - Runs tests and builds the project, preventing issues and bugs from making their way into production.
-- `lint.yml` - Runs ESLint to find linting issues, ensuring that your code is always in compliance with your ESLint rules, which can improve code quality and consistency.
+O script consulta /health, /health/deep e /events, valida status e conteúdo e permite até 120 segundos por requisição. Repetir após deploy ou rollback. Voltar a uma versão anterior não desfaz migrations; alterações incompatíveis de esquema exigem plano de backup e restauração.
 
-Additionally, a `dependabot.yml` configuration is included and run automatically on a weekly basis. It detects outdated npm packages and creates pull requests to update them, ensuring that your npm packages are always up to date, which can improve security and prevent bugs caused by outdated packages.
+## Limitações e evolução
+
+Projeto acadêmico sem interface gráfica, autenticação, autorização, edição ou cancelamento de eventos e inscrições. Usar dados fictícios. A instalação registrou vulnerabilidades em dependências que precisam de avaliação e atualização. Antes de uso real, são necessários backups, monitoramento, revisão de segurança e armazenamento durável. A hospedagem gratuita é temporária.
+
+Evoluções possíveis: autenticação, controle de acesso, limites de requisições, paginação, consulta de participantes e documentação OpenAPI.

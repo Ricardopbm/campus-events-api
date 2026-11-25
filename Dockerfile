@@ -12,4 +12,5 @@ ENV NODE_ENV=production
 RUN npm ci --omit=dev
 COPY --from=base /app/dist ./dist
 COPY --from=base /app/migrations ./migrations
+USER node
 CMD ["npm", "start"]

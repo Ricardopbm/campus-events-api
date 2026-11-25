@@ -1,0 +1,27 @@
+# Prepared configuration. Resources are not created by committing this file.
+services:
+  - type: web
+    name: campus-events-api-ricardopbm
+    runtime: docker
+    repo: https://github.com/Ricardopbm/campus-events-api
+    branch: deploy/ambiente-publicacao
+    plan: free
+    region: virginia
+    healthCheckPath: /health/deep
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: campus-events-db-ricardopbm
+          property: connectionString
+
+databases:
+  - name: campus-events-db-ricardopbm
+    plan: free
+    region: virginia
+    postgresMajorVersion: '17'
+    databaseName: campus_events
+    user: campus_events
+    ipAllowList: []
