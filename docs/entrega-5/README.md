@@ -1,63 +1,70 @@
-# Entrega 5 — Ambiente e publicação (em preparação)
+# Entrega 5 — Ambiente e publicação
 
-Aluno: Ricardo Minuto. Preparação iniciada em 25/11/2026.
+Aluno: Ricardo Minuto. Publicação realizada em 25/11/2026.
 
-**Estado: ainda não publicado.** A URL pública, o banco remoto, o deploy e a validação remota permanecem pendentes da escolha/conexão da hospedagem. Testes locais não são apresentados como prova de publicação.
+A API foi publicada no Render com PostgreSQL 17. O deploy do commit `78aa348182cd73b8bd8f1a9ce706ec0c85a413cd` terminou com sucesso. A validação pública de três endpoints retornou HTTP 200 em 25/11/2026, às 11h40 (Brasília).
 
-## Arquivos preparados
+## Acesso e validação
 
-- `render.yaml`: proposta de API e PostgreSQL no plano Free, na mesma região, com banco acessível pela rede interna e DATABASE_URL referenciada sem credencial no Git. Publicação manual para evitar que cada push de documentação provoque redeploy.
-- `Dockerfile`: build TypeScript em uma etapa; execução em outra, com dependências de produção e usuário node sem privilégios de root.
-- `.dockerignore`: exclui arquivos locais de ambiente, dependências, Git, documentação e relatórios de cobertura do contexto de build.
-- `scripts/check-deploy.mjs`: verifica /health, /health/deep e /events e falha quando status/conteúdo não forem os esperados.
-- [Pesquisa comparativa de alternativas](alternativas-deploy.md).
+URL: https://campus-events-api-ricardopbm.onrender.com
 
-## Publicação proposta no Render
-
-1. Conectar a conta de hospedagem e autorizar acesso ao repositório Ricardopbm/campus-events-api.
-2. Importar o Blueprint render.yaml da branch deploy/ambiente-publicacao, verificando os dois recursos no plano Free antes da criação.
-3. A plataforma constrói a imagem Docker e fornece PORT; DATABASE_URL vem do banco associado. Não copiar o .env de desenvolvimento para o ambiente público.
-4. O processo npm start aplica migrations antes de iniciar a API. O health check /health/deep verifica também a conexão com o banco.
-5. Registrar URL real, identificadores do serviço/deploy, commit implantado, data de criação/expiração do banco e resultado do deploy.
-6. Validar a URL pública com o comando abaixo e salvar a saída como evidência remota.
+- [GET /health](https://campus-events-api-ricardopbm.onrender.com/health): status da API (`healthy`).
+- [GET /health/deep](https://campus-events-api-ricardopbm.onrender.com/health/deep): status da API e conexão com PostgreSQL (`healthy`).
+- [GET /events](https://campus-events-api-ricardopbm.onrender.com/events): lista de eventos (vazia na validação inicial).
 
 ```powershell
-node scripts/check-deploy.mjs https://URL-REAL-DO-SERVICO
+node scripts/check-deploy.mjs https://campus-events-api-ricardopbm.onrender.com
 ```
 
-O script é somente de leitura, verifica três endpoints e permite até 120 segundos por requisição para acomodar a inicialização de uma instância gratuita suspensa. O endereço acima é um marcador, não uma aplicação publicada.
+O script somente consulta dados e verifica o status e o conteúdo das respostas. Permite até 120 segundos por requisição para acomodar a inicialização da instância gratuita suspensa.
 
-## Configuração e limites
+Evidência: [saída da validação pública](evidencias/endpoints-render.txt).
 
-- PORT: fornecida pela hospedagem.
-- DATABASE_URL: credencial privada do banco remoto, configurada no serviço; nunca incluir em prints, logs de entrega ou Git.
-- NODE_ENV: production.
-- No Render Free, o banco expira após 30 dias e a API pode suspender após inatividade. Confirmar as condições no momento da criação e informar a limitação no envio à professora.
-- O projeto acadêmico ainda não tem autenticação para criar eventos e inscrições. Usar apenas dados fictícios na demonstração pública.
+## Ambiente publicado
 
-## Rollback e banco
+| Item | Configuração |
+| --- | --- |
+| Serviço | campus-events-api-ricardopbm — Docker, Free |
+| Banco | campus-events-db-ricardopbm — PostgreSQL 17, Free |
+| Região | Virginia (US East) |
+| Branch | deploy/ambiente-publicacao |
+| Commit implantado | 78aa348182cd73b8bd8f1a9ce706ec0c85a413cd |
+| Deploy | dep-dc3f6fi9lscs73aiins0 — Deploy succeeded |
+| Criação do banco | 25/11/2026, 11h39 (Brasília) |
+| Expiração do banco | 25/12/2026, 11h39 (Brasília) |
 
-No painel do serviço, selecionar um deploy anterior bem-sucedido e executar Rollback, quando disponível. Depois repetir o script de validação. Essa operação volta a aplicação, mas não desfaz migrations. Antes de uma mudança incompatível no banco, planejar backup e restauração; não executar migrations down indiscriminadamente em um banco com dados.
+O painel confirmou ambos os recursos no plano Free e o banco como Available. O serviço levou aproximadamente 36 segundos no primeiro deploy.
 
-## Pendências para concluir
+- [Painel do deploy](https://dashboard.render.com/web/srv-dc3f6f29lscs73aiimv0/deploys/dep-dc3f6fi9lscs73aiins0) (requer acesso à conta).
+- [Blueprint](https://dashboard.render.com/blueprint/exs-dc3f5vetlv9c73c6di8g) (requer acesso à conta).
+- [Pull Request da entrega](https://github.com/Ricardopbm/campus-events-api/pull/11).
+- [Pesquisa comparativa: VPS/Compose e ECS/Fargate/RDS](alternativas-deploy.md).
 
-- [ ] Hospedagem conectada e plano confirmado.
-- [ ] API e PostgreSQL remotos criados.
-- [ ] Deploy concluído e URL pública registrada.
-- [ ] Três endpoints validados pela URL pública, incluindo /health/deep.
-- [ ] Evidências remotas e link do PR reunidos para o envio.
+## Processo de publicação
 
-Nenhum e-mail foi enviado. Os PRs anteriores continuam abertos.
+1. Importar `render.yaml` do repositório público e da branch `deploy/ambiente-publicacao` no Render, com os dois recursos no plano Free.
+2. O Blueprint cria o PostgreSQL e associa sua connection string à variável `DATABASE_URL` da API pela rede interna. Acesso externo ao banco está bloqueado (`ipAllowList: []`).
+3. O Render constrói o Dockerfile: instala dependências, compila TypeScript e prepara uma imagem final com dependências de produção. A aplicação executa como usuário `node`, sem privilégios de root.
+4. O Render fornece `PORT`; `NODE_ENV` está configurada como `production`. O comando `npm start` aplica migrations antes de iniciar a API.
+5. O health check `/health/deep` verifica também o banco. Após o deploy terminar, executar o script de validação acima.
 
-Fontes: [Blueprint do Render](https://render.com/docs/blueprint-spec), [plano gratuito](https://render.com/docs/free) e [rollback](https://render.com/docs/rollbacks), consultadas em 25/11/2026.
+O `.dockerignore` exclui arquivos locais de ambiente, dependências, Git, documentação e cobertura. Credenciais não são incluídas no Git ou nas evidências. `autoDeployTrigger: 'off'` mantém o deploy da aplicação manual; mudanças no Blueprint podem sincronizar a infraestrutura e devem ser revisadas antes do push.
 
-## Validação local realizada
+## Limitações e rollback
 
-Em 25/11/2026, a imagem campus-events-api:entrega5 foi construída com sucesso. Um container com usuário node foi iniciado na porta local 3011, ligado ao PostgreSQL de desenvolvimento. Após a inicialização, /health, /health/deep e /events retornaram HTTP 200 e conteúdo válido. O container de verificação foi parado ao final.
+O banco gratuito expira em **25/12/2026**. A API gratuita suspende com inatividade, e a primeira requisição pode demorar 50 segundos ou mais. Essas condições precisam ser consideradas na avaliação; a URL não representa hospedagem permanente. Nenhum plano pago foi contratado.
 
-A primeira chamada ocorreu antes de a API terminar a inicialização e falhou na conexão. Após confirmar o log de servidor iniciado, a validação foi repetida com sucesso. O script deve ser executado depois de o deploy ficar pronto.
+O projeto acadêmico ainda não tem autenticação para criar eventos e inscrições. Usar apenas dados fictícios na demonstração pública.
+
+Para voltar a uma versão anterior, selecionar um deploy anterior bem-sucedido no painel e executar Rollback, quando disponível, depois repetir a validação. Isso reverte a aplicação, mas não desfaz migrations. Antes de alterações incompatíveis no banco, planejar backup e restauração. O rollback não foi executado nesta entrega, pois este é o primeiro deploy.
+
+## Validações locais anteriores
+
+A imagem `campus-events-api:entrega5` foi construída e testada localmente com PostgreSQL de desenvolvimento. A primeira requisição ocorreu antes da inicialização e falhou; a repetição após o servidor iniciar passou. O container local de verificação foi parado ao final.
 
 - [Build Docker local](evidencias/build-docker-local.txt).
 - [Endpoints do container local](evidencias/endpoints-docker-local.txt).
 
-Esses registros comprovam somente o teste local, não a publicação na internet.
+A evidência remota está separada em `endpoints-render.txt`. Nenhum e-mail foi enviado e os PRs anteriores continuam abertos.
+
+Fontes: [Blueprint do Render](https://render.com/docs/blueprint-spec), [plano gratuito](https://render.com/docs/free) e [rollback](https://render.com/docs/rollbacks), consultadas em 25/11/2026. Estado da implantação e expiração confirmados no painel da conta.

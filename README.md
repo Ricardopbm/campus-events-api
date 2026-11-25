@@ -7,7 +7,9 @@ Repositório de Ricardo Minuto, a partir do projeto fornecido em [BeahIF/campus-
 - [Entrega 2 — funcionalidades, PRs e evidências](docs/entrega-2/README.md)
 - [Entrega 3 — regras de domínio e testes unitários](docs/entrega-3/README.md)
 - [Entrega 4 — integração contínua e cobertura](docs/entrega-4/README.md)
-- [Entrega 5 — preparação de deploy (publicação pendente)](docs/entrega-5/README.md)
+- [Entrega 5 — API publicada, validação e alternativas de deploy](docs/entrega-5/README.md)
+
+API publicada: https://campus-events-api-ricardopbm.onrender.com. Para conferir API e banco, acesse `/health/deep`. Instruções, evidências e expiração do banco gratuito em 25/12/2026 estão no relatório da entrega 5 acima.
 
 A documentação do template original está preservada abaixo, com a URL de clone adaptada para este fork.
 
