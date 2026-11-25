@@ -4,7 +4,7 @@ API para cadastro e listagem de eventos de um campus e inscrições com controle
 
 ## Versão e acesso
 
-A versão com eventos, inscrições, regras de domínio, testes, CI e deploy está na branch **deploy/ambiente-publicacao**. Os PRs ainda estão em integração; a main não contém todas essas funcionalidades. A refatoração do PR #12 foi integrada à branch feat/inscricoes-eventos e ainda precisa ser conciliada com as etapas posteriores.
+A versão integrada está na branch **main**, incluindo eventos, inscrições, regras de domínio, testes, CI e a separação das consultas por domínio. Os PRs #7 a #12 foram integrados preservando o histórico de contribuição.
 
 API: https://campus-events-api-ricardopbm.onrender.com
 
@@ -17,7 +17,7 @@ O banco gratuito expira em **25/12/2026**. A primeira requisição após inativi
 Requisitos: Git, Node.js 22 com npm e Docker Desktop iniciado. A pipeline também verifica Node 20. Exemplos para PowerShell:
 
 ```powershell
-git clone --branch deploy/ambiente-publicacao https://github.com/Ricardopbm/campus-events-api.git
+git clone --branch main https://github.com/Ricardopbm/campus-events-api.git
 cd campus-events-api
 Copy-Item .env.example .env
 npm.cmd ci
@@ -129,7 +129,7 @@ CI e Lint executam em qualquer push e em PRs, além dos gatilhos manuais e reuti
 
 ## Publicação e validação
 
-render.yaml define Web Service Docker e PostgreSQL no plano Free, na região Virginia. DATABASE_URL vem da conexão interna; PORT é fornecida pelo Render e NODE_ENV vale production. Acesso externo ao banco está bloqueado. O health check é /health/deep. O deploy inicial usa o commit 78aa348.
+render.yaml define Web Service Docker e PostgreSQL no plano Free, na região Virginia. DATABASE_URL vem da conexão interna; PORT é fornecida pelo Render e NODE_ENV vale production. Acesso externo ao banco está bloqueado. O health check é /health/deep. O deploy inicial usou o commit 78aa348. As próximas publicações usam a main integrada; conferir o commit ativo no painel do Render.
 
 O deploy da aplicação é manual (autoDeployTrigger: off). Mudanças no Blueprint podem sincronizar a infraestrutura e precisam ser revisadas antes do push.
 

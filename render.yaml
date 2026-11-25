@@ -4,7 +4,7 @@ services:
     name: campus-events-api-ricardopbm
     runtime: docker
     repo: https://github.com/Ricardopbm/campus-events-api
-    branch: deploy/ambiente-publicacao
+    branch: main
     plan: free
     region: virginia
     healthCheckPath: /health/deep
