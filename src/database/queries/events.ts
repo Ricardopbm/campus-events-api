@@ -1,5 +1,5 @@
 import type { Pool } from 'pg';
-import type { CampusEvent, EventInput } from '../../routes/events';
+import type { CampusEvent, EventInput } from '../../domain/events';
 
 export const makeEventQueries = (pool: Pool) => ({
   getEvents: async (): Promise<CampusEvent[]> => {

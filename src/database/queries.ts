@@ -3,7 +3,7 @@ import { makePeopleQueries } from './queries/people';
 import { makeEventQueries } from './queries/events';
 import { makeRegistrationQueries } from './queries/registrations';
 import type { Person } from './types';
-import type { CampusEvent, EventInput } from '../routes/events';
+import type { CampusEvent, EventInput } from '../domain/events';
 import type { Registration, RegistrationInput } from '../routes/registrations';
 
 export interface Queries {
